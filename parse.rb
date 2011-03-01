@@ -9,10 +9,10 @@ end
 
 $transforms = {
               # Standard
-                # variable assignment var var
-                '='             => lambda { |s, a| { v(s,a[0]) => v(s,a[1]) } },
                 # identity $1
                 ''              => lambda { |s, a| s },
+                # variable assignment var var
+                '='             => lambda { |s, a| { v(s,a[0]) => v(s,a[1]) } },
               # RMagick
                 # edge $1 int 
                 'edge'          => lambda { |s, a| { v(s,a[0]) => v(s,a[0]).edge(v(s,a[1])) } },
