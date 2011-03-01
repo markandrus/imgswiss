@@ -49,9 +49,7 @@ class Transforms
 end
 
 # Transform; usage:
-#   t = Transform.new('scale', ['1', '2'])
-#   t.call(state)
-# NOTE: I think args need to be `push`ed on in order.
+# NOTE: Args need to be `push`ed on in order.
 class Transform
    def initialize(name, args)
        @transform = $transforms[name]
