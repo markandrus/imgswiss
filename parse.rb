@@ -2,6 +2,66 @@
 # Parser for Image Filter Plans
 require 'RMagick'
 require 'parslet'
+require 'optparse'
+require 'ostruct'
+
+require 'pp'
+
+class OptionParse
+    def self.parse(args)
+        options = OpenStruct.new
+        options.stdin = false
+        options.inplace = false
+        options.plans = []
+
+        opts = OptionParser.new do |opts|
+            opts.banner = "Pipeline-Based Image Editor <andrus@uchicago.edu>\n" +
+                          "Usage: pipeline.rb [options]\n" +
+                          "Example: pipeline.rb -p plan.p -i images/"
+            opts.separator ""
+            opts.separator "Specific options:"
+            # Input
+            opts.on("-i", "--in-dir DIR",
+                    "Read input from DIR") do |dir|
+                options.indir = dir
+            end
+            opts.on("--stdin", String, "Read input for a single file via STDIN") do
+                options.stdin = true
+            end
+            # Output
+            opts.on("-o", "--out-dir DIR", 
+                    "Save output to DIR") do |dir|
+                options.outdir = dir
+            end
+            opts.on("-I", "--in-place",
+                    "Overwrite input files with output") do
+                options.inplace = true
+            end
+            # Plan(s)
+            opts.on("-p", "--plan PLAN",
+                    "Process according to PLAN") do |plan|
+                options.plans << plan
+            end
+            opts.on("--plans x,y,z", Array, "Process through a sequence of plan") do |plans|
+                options.plans.concat(plans)
+            end
+            # Boilerplate
+            opts.on_tail("-h", "--help", "Show this message") do
+                puts opts
+                exit
+            end
+            opts.on_tail("--version", "Show version") do
+                puts "0.1"
+                exit
+            end
+        end
+        opts.parse!(args)
+        options
+    end
+end
+
+options = OptionParse.parse(ARGV)
+pp options;
 
 # NOTE: This is a place holder function for now. It is intended to be called
 # when 
@@ -131,7 +191,7 @@ rescue Parslet::ParseFailed => error
 end
 
 # Test
-(parse "wave $1 10 200").to_proc.call({"1" => Magick::ImageList.new("/Users/markandrusroberts/tmp/img.png") })
+# (parse "wave $1 10 200").to_proc.call({"1" => Magick::ImageList.new("/Users/markandrusroberts/tmp/img.png") })
 parse "edge $1 6"
 parse "implode $1 0.8"
 
