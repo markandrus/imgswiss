@@ -5,6 +5,7 @@ require 'parslet'
 require 'optparse'
 require 'ostruct'
 
+
 require 'pp'
 
 class OptionParse
@@ -200,8 +201,11 @@ $pipeline = Transforms.new
 options.plans.each { |p| File.readlines(p).each { |line| $pipeline.add(parse(line)) } }
 
 # Load images
-files = ImageList.new
-options.indir.each { |file| files << ImageList.new(options.indir.path + '/' + file) }
+files = Magick::ImageList.new
+if options.indir.empty?
+else
+    options.indir.each { |file| files << Magick::ImageList.new(options.indir.path + '/' + file) }
+end
 
 # Apply 
 # NOTE: We could collapse this process with the one above
