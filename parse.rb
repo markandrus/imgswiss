@@ -5,8 +5,9 @@ require 'parslet'
 require 'optparse'
 require 'ostruct'
 
-
 require 'pp'
+
+$verbose = false
 
 class OptionParse
     def self.parse(args)
@@ -51,6 +52,9 @@ class OptionParse
                 puts opts
                 exit
             end
+            opts.on_tail("-v", "--verbose", "Verbose output") do
+                $verbose = true
+            end
             opts.on_tail("--version", "Show version") do
                 puts "0.1"
                 exit
@@ -62,7 +66,6 @@ class OptionParse
 end
 
 options = OptionParse.parse(ARGV)
-pp options;
 
 # NOTE: This is a place holder function for now. It is intended to be called
 # when 
@@ -188,17 +191,38 @@ def parse(str)
         return build_transform('=', t[:assign][:args])
     end
 rescue Parslet::ParseFailed => error
-    puts error, parser.root.error_tree
+    puts error, t.root.error_tree
 end
 
 # Build our transformation pipeline
 $pipeline = Transforms.new
-options.plans.each { |p| File.readlines(p).each { |line| $pipeline.add(parse(line)) } }
+options.plans.each do |plan|
+    if $verbose
+        $stderr.puts "Parsing plan: `" + plan + "'"
+    end
+    File.readlines(plan).each do |line|
+        line.chomp!
+        if $verbose
+            $stderr.puts '>>> "' + line + '"'
+        end
+        $pipeline.add(&parse(line))
+    end
+end
 
 # Load images
 if options.stdin # are we processing stdin?
+    if $verbose
+        $stderr.puts "Reading single image from STDIN..."
+    end
     file = Magick::ImageList.new.from_blob(ARGF.read)
-    puts pipeline.to_proc.call({"1" => file})['1'].to_blob
+    if !file.nil?
+        $stderr.puts ">>> OK!"
+        $stderr.puts "Processing..."
+        $stderr.print ">>> STDIN"
+        options.plans.each { |plan| $stderr.print " >>= " + plan }
+        $stderr.puts " >>= STDOUT"
+        puts $pipeline.to_proc.call({"1" => file})['1'].to_blob
+    end
 elsif !options.indir.nil? # then let's load a dir of files
     files = Magick::ImageList.new
     options.indir.each { |file| files << Magick::ImageList.new(options.indir.path + '/' + file) }
