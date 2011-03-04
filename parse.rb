@@ -23,7 +23,7 @@ class OptionParse
             # Input
             opts.on("-i", "--in-dir DIR",
                     "Read input from DIR") do |dir|
-                options.indir = dir
+                options.indir = Dir.new(dir)
             end
             opts.on("--stdin", String, "Read input for a single file via STDIN") do
                 options.stdin = true
@@ -104,7 +104,7 @@ $transforms = {
 # Transforms; usage:
 #   ts = Transforms.new
 #   ts.add(assignment)
-#   ts.call(state)
+#   ts.to_proc.call(state)
 class Transforms
     def initialize
         @transforms = []
@@ -198,4 +198,12 @@ parse "implode $1 0.8"
 # Build our transformation pipeline
 $pipeline = Transforms.new
 options.plans.each { |p| File.readlines(p).each { |line| $pipeline.add(parse(line)) } }
+
+# Load images
+files = ImageList.new
+options.indir.each { |file| files << ImageList.new(options.indir.path + '/' + file) }
+
+# Apply 
+# NOTE: We could collapse this process with the one above
+files.each { |file| $pipeline.to_proc.call(file)['1'].write(options.outdir + '/' + file.filename) }
 
