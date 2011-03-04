@@ -3,33 +3,42 @@
 require 'RMagick'
 require 'parslet'
 
+# NOTE: This is a place holder function for now. It is intended to be called
+# when 
 def v(s, a)
     return a.call(s)
 end
 
 $transforms = {
               # Standard
-                # identity $1
+                # identity
                 ''              => lambda { |s, a| s },
-                # variable assignment var var
+                # variable assignment
                 '='             => lambda { |s, a| { v(s,a[0]) => v(s,a[1]) } },
               # RMagick
-                # edge $1 int 
-                'edge'          => lambda { |s, a| { v(s,a[0]) => v(s,a[0]).edge(v(s,a[1])) } },
-                # emboss $1
-                'emboss'        => lambda { |s, a| { v(s,a[0]) => v(s,a[0]).emboss } },
-                # flip $1
-                'flip'          => lambda { |s, a| { v(s,a[0]) => v(s,a[0]).flip } },
-                # implode $1 float
-                'implode'       => lambda { |s, a| { v(s,a[0]) => v(s,a[0]).implode(v(s,a[1])) } },
-                # invert $1
-                'invert'        => lambda { |s, a| { v(s,a[0]) => v(s,a[0]).negate } },
-                # oil paint $1
-                'oil_paint'     => lambda { |s, a| { v(s,a[0]) => v(s,a[0]).oilpaint } },
-                # spread $1
-                'spread'        => lambda { |s, a| { v(s,a[0]) => v(s,a[0]).spread } },
-                # wave $1 int int
-                'wave'          => lambda { |s, a| { v(s,a[0]) => v(s,a[0]).wave(v(s,a[1]), v(s,a[2])) } },
+                # edge $$ int 
+                'edge'          => lambda { |s, a| { '1' => v(s,a[0]).edge(v(s,a[1])) } },
+                # emboss $$
+                'emboss'        => lambda { |s, a| { '1' => v(s,a[0]).emboss } },
+                # flip $$
+                'flip'          => lambda { |s, a| { '1' => v(s,a[0]).flip } },
+                # implode $$ float
+                'implode'       => lambda { |s, a| { '1' => v(s,a[0]).implode(v(s,a[1])) } },
+                # invert $$
+                'invert'        => lambda { |s, a| { '1' => v(s,a[0]).negate } },
+                # oil_paint $$
+                'oil_paint'     => lambda { |s, a| { '1' => v(s,a[0]).oilpaint } },
+                # spread $$
+                'spread'        => lambda { |s, a| { '1' => v(s,a[0]).spread } },
+                # wave $$ int int
+                'wave'          => lambda { |s, a| { '1' => v(s,a[0]).wave(v(s,a[1]), v(s,a[2])) } },
+              # RMagick'
+                # splitRGB $$ 
+                'splitRGB'      => lambda { |s, a| { '1' => v(s,a[0]).channel(RedChannel),
+                                                     '2' => v(s,a[0]).channel(BlueChannel),
+                                                     '3' => v(s,a[0]).channel(GreenChannel) } },
+                # joinRGB $$ $$ $$
+                'joinRGB'       => lambda { |s, a| { '1' => v(s,a[0]).dup.combine(v(s,a[0]), v(s,a[1]), v(s,a[2])) } }
               }
 
 # Transforms; usage:
@@ -51,14 +60,16 @@ end
 # Transform; usage:
 # NOTE: Args need to be `push`ed on in order.
 class Transform
-   def initialize(name, args)
-       @transform = $transforms[name]
-       @args = args
-   end
-   def to_proc
-       # lambda { |state| state.update(@transform.call(state, @args.map { |arg| state[arg] } )) }
-       lambda { |state| state.update(@transform.call(state, @args)) }
-   end
+    def initialize(name, args)
+        @transform = $transforms[name]
+        @args = args
+    end
+    def to_proc
+        # NOTE: I probably need to be smarter about this--Are the updated
+        #       images getting freed (Image.destroy!-ed) on update?
+        # lambda { |state| state.update(@transform.call(state, @args.map { |arg| state[arg] } )) }
+        lambda { |state| state.update(@transform.call(state, @args)) }
+    end
 end
 
 # Parslet::Parser
