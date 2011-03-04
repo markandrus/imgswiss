@@ -191,23 +191,19 @@ rescue Parslet::ParseFailed => error
     puts error, parser.root.error_tree
 end
 
-# Test
-# (parse "wave $1 10 200").to_proc.call({"1" => Magick::ImageList.new("/Users/markandrusroberts/tmp/img.png") })
-parse "edge $1 6"
-parse "implode $1 0.8"
-
 # Build our transformation pipeline
 $pipeline = Transforms.new
 options.plans.each { |p| File.readlines(p).each { |line| $pipeline.add(parse(line)) } }
 
 # Load images
-files = Magick::ImageList.new
-if options.indir.empty?
-else
+if options.stdin # are we processing stdin?
+    file = Magick::ImageList.new.from_blob(ARGF.read)
+    puts pipeline.to_proc.call({"1" => file})['1'].to_blob
+elsif !options.indir.nil? # then let's load a dir of files
+    files = Magick::ImageList.new
     options.indir.each { |file| files << Magick::ImageList.new(options.indir.path + '/' + file) }
+    # Apply 
+    # NOTE: We could collapse this process with the one above
+    files.each { |file| $pipeline.to_proc.call({"1" => file})['1'].write(options.outdir + '/' + file.filename) }
 end
-
-# Apply 
-# NOTE: We could collapse this process with the one above
-files.each { |file| $pipeline.to_proc.call(file)['1'].write(options.outdir + '/' + file.filename) }
 
