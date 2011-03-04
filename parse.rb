@@ -195,3 +195,7 @@ end
 parse "edge $1 6"
 parse "implode $1 0.8"
 
+# Build our transformation pipeline
+$pipeline = Transforms.new
+options.plans.each { |p| File.readlines(p).each { |line| $pipeline.add(parse(line)) } }
+
