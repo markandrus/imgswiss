@@ -224,10 +224,23 @@ if options.stdin # are we processing stdin?
         puts $pipeline.to_proc.call({"1" => file})['1'].to_blob
     end
 elsif !options.indir.nil? # then let's load a dir of files
-    files = Magick::ImageList.new
-    options.indir.each { |file| files << Magick::ImageList.new(options.indir.path + '/' + file) }
+    files = []
+    options.indir.each do |file|
+        if file != '.' && file != '..'
+            $stderr.puts ">>> Adding `" + options.indir.path + file + "'"
+            image = Magick::ImageList.new(options.indir.path + file)
+            files << image
+        end
+    end
     # Apply 
     # NOTE: We could collapse this process with the one above
-    files.each { |file| $pipeline.to_proc.call({"1" => file})['1'].write(options.outdir + '/' + file.filename) }
+    puts "Processing..."
+    files.each do |file|
+        $stderr.print ">>> " + file.filename
+        options.plans.each { |plan| $stderr.print " >>= " + plan }
+        $stderr.puts " >>= " + options.outdir + file.filename
+        $pipeline.to_proc.call({"1" => file})['1'].write(options.outdir +
+                                                         file.filename.rpartition('/').last)
+    end
 end
 
