@@ -203,7 +203,7 @@ options.plans.each do |plan|
     File.readlines(plan).each do |line|
         line.chomp!
         if $verbose
-            $stderr.puts '>>> "' + line + '"'
+            $stderr.puts '    "' + line + '"'
         end
         $pipeline.add(&parse(line))
     end
@@ -216,29 +216,40 @@ if options.stdin # are we processing stdin?
     end
     file = Magick::Image.new.from_blob(ARGF.read)
     if !file.nil?
-        $stderr.puts ">>> OK!"
-        $stderr.puts "Processing..."
-        $stderr.print ">>> STDIN"
-        options.plans.each { |plan| $stderr.print " >>= " + plan }
-        $stderr.puts " >>= STDOUT"
+		if $verbose
+			$stderr.puts "    OK!"
+			$stderr.puts "Processing..."
+			$stderr.print "    STDIN"
+			options.plans.each { |plan| $stderr.print " >>= " + plan }
+			$stderr.puts " >>= STDOUT"
+		end
         puts $pipeline.to_proc.call({"1" => file})['1'].to_blob
     end
 elsif !options.indir.nil? # then let's load a dir of files
     files = []
+	if $verbose
+		puts "Reading directory: `" + options.indir.path + "'"
+	end
     options.indir.each do |file|
         if file != '.' && file != '..'
-            $stderr.puts ">>> Adding `" + options.indir.path + file + "'"
+			if $verbose
+				$stderr.puts "    Adding `" + options.indir.path + file + "'"
+			end
             image = Magick::ImageList.new(options.indir.path + file)
             files << image
         end
     end
     # Apply 
     # NOTE: We could collapse this process with the one above
-    puts "Processing..."
+    if $verbose
+		puts "Processing..."
+	end
     files.each do |file|
-        $stderr.print ">>> " + file.filename
-        options.plans.each { |plan| $stderr.print " >>= " + plan }
-        $stderr.puts " >>= " + options.outdir + file.filename.rpartition('/').last
+		if $verbose
+			$stderr.print "    " + file.filename
+			options.plans.each { |plan| $stderr.print " >>= " + plan }
+			$stderr.puts " >>= " + options.outdir + file.filename.rpartition('/').last
+		end
         $pipeline.to_proc.call({"1" => file})['1'].write(options.outdir +
                                                          file.filename.rpartition('/').last)
     end
