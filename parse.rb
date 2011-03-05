@@ -98,11 +98,11 @@ $transforms = {
                 'wave'          => lambda { |s, a| { '1' => v(s,a[0]).wave(v(s,a[1]), v(s,a[2])) } },
               # RMagick'
                 # splitRGB $$ 
-                'splitRGB'      => lambda { |s, a| { '1' => v(s,a[0]).channel(RedChannel),
-                                                     '2' => v(s,a[0]).channel(BlueChannel),
-                                                     '3' => v(s,a[0]).channel(GreenChannel) } },
+                'splitRGB'      => lambda { |s, a| { '1' => v(s,a[0]).channel(Magick::RedChannel),
+                                                     '2' => v(s,a[0]).channel(Magick::BlueChannel),
+                                                     '3' => v(s,a[0]).channel(Magick::GreenChannel) } },
                 # joinRGB $$ $$ $$
-                'joinRGB'       => lambda { |s, a| { '1' => v(s,a[0]).dup.combine(v(s,a[0]), v(s,a[1]), v(s,a[2])) } }
+                'joinRGB'       => lambda { |s, a| { '1' => Magick::Image.combine(v(s,a[0]), v(s,a[1]), v(s,a[2])) } }
               }
 
 # Transforms; usage:
@@ -214,7 +214,7 @@ if options.stdin # are we processing stdin?
     if $verbose
         $stderr.puts "Reading single image from STDIN..."
     end
-    file = Magick::ImageList.new.from_blob(ARGF.read)
+    file = Magick::Image.new.from_blob(ARGF.read)
     if !file.nil?
         $stderr.puts ">>> OK!"
         $stderr.puts "Processing..."
@@ -238,7 +238,7 @@ elsif !options.indir.nil? # then let's load a dir of files
     files.each do |file|
         $stderr.print ">>> " + file.filename
         options.plans.each { |plan| $stderr.print " >>= " + plan }
-        $stderr.puts " >>= " + options.outdir + file.filename
+        $stderr.puts " >>= " + options.outdir + file.filename.rpartition('/').last
         $pipeline.to_proc.call({"1" => file})['1'].write(options.outdir +
                                                          file.filename.rpartition('/').last)
     end
