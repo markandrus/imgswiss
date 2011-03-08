@@ -49,7 +49,7 @@ class OptionParse
                     "Process according to PLAN") do |plan|
                 options.plans << plan
             end
-            opts.on("--plans x,y,z", Array, "Process through a sequence of plan") do |plans|
+            opts.on("--plans x,y,z", Array, "Process through a sequence of plans") do |plans|
                 options.plans.concat(plans)
             end
             # Boilerplate
