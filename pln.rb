@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 # Parser for Image Filter Plans
+require 'rubygems'
 require 'RMagick'
 require 'ffmpeg'
 require 'parslet'
@@ -14,6 +15,7 @@ class OptionParse
         options.stdin = false
         options.inplace = false
         options.plans = []
+		options.invideo = ""
 
         opts = OptionParser.new do |opts|
             opts.banner = "Pipeline-Based Image Editor <andrus@uchicago.edu>\n" +
@@ -22,8 +24,7 @@ class OptionParse
             opts.separator ""
             opts.separator "Specific options:"
             # Input
-            opts.on("-i", "--in-dir DIR",
-                    "Read input from DIR") do |dir|
+            opts.on("-i", "--in-dir DIR", "Read input from DIR") do |dir|
                 options.indir = Dir.new(dir)
             end
             opts.on("--stdin", String, "Read input for a single image via STDIN") do
@@ -33,20 +34,17 @@ class OptionParse
                 options.invideo = input
             end
             # Output
-            opts.on("-o", "--out-dir DIR", 
-                    "Save output to DIR") do |dir|
+            opts.on("-o", "--out-dir DIR", "Save output to DIR") do |dir|
                 options.outdir = dir
             end
             opts.on("--out-video", String, "Save processed video as `filename'") do |output|
                 options.outvideo = output
             end
-            opts.on("-I", "--in-place",
-                    "Overwrite input files with output") do
+            opts.on("-I", "--in-place", "Overwrite input files with output") do
                 options.inplace = true
             end
             # Plan(s)
-            opts.on("-p", "--plan PLAN",
-                    "Process according to PLAN") do |plan|
+            opts.on("-p", "--plan PLAN", "Process according to PLAN") do |plan|
                 options.plans << plan
             end
             opts.on("--plans x,y,z", Array, "Process through a sequence of plans") do |plans|
@@ -270,7 +268,7 @@ elsif !options.indir.nil? # then let's load a dir of files
             processed.write(file.filename)
         end
     end
-elsif !options.invideo.nil?
+elsif !options.invideo.nil? # then let's read a video
     frames = []
     if $verbose
         puts "Reading video: `" + options.invideo + "'"
