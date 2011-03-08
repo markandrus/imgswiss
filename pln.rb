@@ -5,8 +5,6 @@ require 'parslet'
 require 'optparse'
 require 'ostruct'
 
-require 'pp'
-
 $verbose = false
 
 class OptionParse
@@ -18,8 +16,8 @@ class OptionParse
 
         opts = OptionParser.new do |opts|
             opts.banner = "Pipeline-Based Image Editor <andrus@uchicago.edu>\n" +
-                          "Usage: pipeline.rb [options]\n" +
-                          "Example: pipeline.rb -p plan.p -i images/"
+                          "Usage: pln.rb [options]\n" +
+                          "Example: pln.rb -p plan.p -i images/"
             opts.separator ""
             opts.separator "Specific options:"
             # Input
