@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 # Parser for Image Filter Plans
 require 'RMagick'
+require 'ffmpeg'
 require 'parslet'
 require 'optparse'
 require 'ostruct'
@@ -25,13 +26,19 @@ class OptionParse
                     "Read input from DIR") do |dir|
                 options.indir = Dir.new(dir)
             end
-            opts.on("--stdin", String, "Read input for a single file via STDIN") do
+            opts.on("--stdin", String, "Read input for a single image via STDIN") do
                 options.stdin = true
+            end
+            opts.on("--in-video", String, "Read video using FFmpeg") do |input|
+                options.invideo = input
             end
             # Output
             opts.on("-o", "--out-dir DIR", 
                     "Save output to DIR") do |dir|
                 options.outdir = dir
+            end
+            opts.on("--out-video", String, "Save processed video as `filename'") do |output|
+                options.outvideo = output
             end
             opts.on("-I", "--in-place",
                     "Overwrite input files with output") do
@@ -214,25 +221,28 @@ if options.stdin # are we processing stdin?
     end
     file = Magick::Image.new.from_blob(ARGF.read)
     if !file.nil?
-		if $verbose
-			$stderr.puts "    OK!"
-			$stderr.puts "Processing..."
-			$stderr.print "    STDIN"
-			options.plans.each { |plan| $stderr.print " >>= " + plan }
-			$stderr.puts " >>= STDOUT"
-		end
+        if $verbose
+            $stderr.puts "    OK!"
+            $stderr.puts "Processing..."
+            $stderr.print "    STDIN"
+            options.plans.each { |plan| $stderr.print " >>= " + plan }
+            $stderr.puts " >>= STDOUT"
+        end
         puts $pipeline.to_proc.call({"1" => file})['1'].to_blob
     end
 elsif !options.indir.nil? # then let's load a dir of files
     files = []
-	if $verbose
-		puts "Reading directory: `" + options.indir.path + "'"
-	end
+    if !options.outvideo.nil?
+        video = FFMPEG::InputFormat.new(options.outvideo)
+    end
+    if $verbose
+        puts "Reading directory: `" + options.indir.path + "'"
+    end
     options.indir.each do |file|
         if file != '.' && file != '..'
-			if $verbose
-				$stderr.puts "    Adding `" + options.indir.path + file + "'"
-			end
+            if $verbose
+                $stderr.puts "    Adding `" + options.indir.path + file + "'"
+            end
             image = Magick::ImageList.new(options.indir.path + file)
             files << image
         end
@@ -240,16 +250,73 @@ elsif !options.indir.nil? # then let's load a dir of files
     # Apply 
     # NOTE: We could collapse this process with the one above
     if $verbose
-		puts "Processing..."
-	end
+        puts "Processing..."
+    end
     files.each do |file|
-		if $verbose
-			$stderr.print "    " + file.filename
-			options.plans.each { |plan| $stderr.print " >>= " + plan }
-			$stderr.puts " >>= " + options.outdir + file.filename.rpartition('/').last
-		end
-        $pipeline.to_proc.call({"1" => file})['1'].write(options.outdir +
-                                                         file.filename.rpartition('/').last)
+        if $verbose
+            $stderr.print "    " + file.filename
+            options.plans.each { |plan| $stderr.print " >>= " + plan }
+            if !options.outdir.nil?
+                $stderr.puts " >>= " + options.outdir + file.filename.rpartition('/').last
+            else
+                $stderr.puts " >>= " + file.filename
+            end
+        end
+        processed = $pipeline.to_proc.call({"1" => file})['1'] # Process
+        if !options.outdir.nil? # write to outdir
+            processed.write(options.outdir + file.filename.rpartition('/').last)
+        end
+        if options.inplace # overwrite input file
+            processed.write(file.filename)
+        end
+    end
+elsif !options.invideo.nil?
+    frames = []
+    if $verbose
+        puts "Reading video: `" + options.invideo + "'"
+        #if !options.videostart.nil?
+        #    puts "    Start: " + options.videostart + " "
+        #end
+        #if !options.videostop.nil?
+        #    puts "    Stop: " + options.videostop + " "
+        #end
+    end
+    # THANKS: ffmpeg-ruby / animated_gif_example.rb
+    video = FFMPEG::InputFormat.new(options.invideo)
+    stream = video.first_video_stream
+    # TODO: Add a CLI option to specify initial offset
+    # stream.seek(12)
+    i = 0
+    # pts is presentation timestamp
+    # dts is decoding timestamp
+    stream.decode_frame do |frame, pts, dts|
+        i += 1
+        # TODO: Add a CLI option to specify the end
+        # stop when decoding timestamp (~position) reach 18
+        # break if dts > 18
+        # TODO: Change the 5 in the following. I don't know what this is? FPS?
+        # decode 1 frame for 5
+        next unless i % 5 == 0
+        image = Magick::ImageList.from_blob(frame.to_ppm)
+        frames << image
+    end
+    if $verbose
+        puts "Processing..."
+        # TODO: Rewrite the following
+        puts "    " + options.invideo + " >>= " + options.invideo
+    end
+    i = 0
+    if $verbose and !options.outdir.nil?
+        puts "Dumping frames to: `" + options.outdir + "'"
+    end
+    framename = options.invideo.rpartition('/').last
+    frames.each do |frame|
+        processed = $pipeline.to_proc.call({"1" => frame})['1'] # Process
+        if !options.outdir.nil? # write to outdir
+            # TODO: Add a CLI option to specify output frame filetype
+            processed.write(options.outdir + framename + i.to_s + '.png')
+            i += 1
+        end
     end
 end
 
