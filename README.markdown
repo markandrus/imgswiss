@@ -6,15 +6,18 @@ intuitive, flexible domain-specific language (DSL).
 ## Installing
 To get Pipeline.rb running, first you must have Ruby: http://www.ruby-lang.org/en/downloads/
 
+### Dependencies
 Second, Pipeline.rb requires both RMagick (https://github.com/rmagick/rmagick)
 and FFMpeg (http://ffmpeg.org/download.html).
 
-RMagick depends on ImageMagick, which you may download or build for your
-system, depending on what suits you (http://www.imagemagick.org/script/index.php).
-If you already have ImageMagick installed, getting RMagick should be as simple
-as:
+### RMagick
+RMagick depends on ImageMagick, which you can download or build. Whatever floats your
+boat: http://www.imagemagick.org/script/index.php
+
+If you already have ImageMagick installed, getting RMagick should be as simple as:
 	gem install rmagick
 
+### FFMpeg
 Pipeline.rb interfaces with FFMpeg using Antonin Amand's ffmpeg-ruby gem.
 I don't think you can `gem install` this, and it is confusing because there are
 multiple similarly named packages on rubygems.org.
@@ -25,6 +28,25 @@ follow Amand's instructions to install ffmpeg-ruby: https://github.com/gwik/ffmp
 TIP: If you're like me, and couldn't figure out how to build FFMpeg to work
 with ffmpeg-ruby on OS X, try:
 	./configure --enable-shared --disable-static
+
+## Usage
+Invert an entire directory of images and save the output to
+another directory:
+	./pipeline.rb -i input/ -p invert.p -o output/
+
+Invert the inversion of an entire directory of images and
+save the output in-place:
+	./pipeline.rb -i input/ -p invert.p -p invert.p --in-place
+Or,
+	./pipeline.rb --in-dir input/ --plans invert.p,invert.p -I
+
+Invert every frame of a video file and dump the results to a directory:
+	./pipeline.rb --in-vid family.mov --plan invert.p --out-dir frames/
+
+Just process a single via stdin:
+	cat gucci_mane.png | ./pipeline.rb --stdin -p invert.p >gucci_invert.png
+Or,
+	./pipeline.rb --stdin -p invert.p <gucci_mane.png >gucci_invert.png
 
 ## Plan File Syntax
 The syntax for Pipeline.rb's plan-files is inspired in part by the patching

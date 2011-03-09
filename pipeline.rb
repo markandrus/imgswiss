@@ -31,14 +31,14 @@ class OptionParse
             opts.on("--stdin", "Read input for a single image via STDIN") do
                 options.stdin = true
             end
-            opts.on("--in-video PATH", String, "Read video using FFmpeg") do |path|
+            opts.on("--in-vid PATH", String, "Read video using FFmpeg") do |path|
                 options.invideo = path
             end
             # Output
             opts.on("-o", "--out-dir DIR", "Save output to DIR") do |dir|
                 options.outdir = dir
             end
-            opts.on("--out-video PATH", String, "Save processed video as `filename'") do |path|
+            opts.on("--out-vid PATH", String, "Save processed video as `filename'") do |path|
                 options.outvideo = path
             end
             opts.on("-I", "--in-place", "Overwrite input files with output") do
