@@ -22,6 +22,23 @@ Tip: If you're like me, and couldn't figure out how to build FFMpeg to work with
 	./configure --enable-shared --disable-static
 
 ## Usage
+	Pipeline Image Sequence Editor <andrus@uchicago.edu>
+	Usage: pipeline.rb [options]
+	Example: pipeline.rb -p plan.p -i images/
+
+	Specific options:
+		-i, --in-dir DIR                 Read input from DIR
+			--stdin                      Read input for a single image via STDIN
+			--in-vid PATH                Read video using FFmpeg
+		-o, --out-dir DIR                Save output to DIR
+			--out-vid PATH               Save processed video as `filename'
+		-I, --in-place                   Overwrite input files with output
+		-p, --plan PLAN                  Process according to PLAN
+			--plans x,y,z                Process through a sequence of plans
+		-h, --help                       Show this message
+		-v, --verbose                    Verbose output
+			--version                    Show version
+
 Invert an entire directory of images and save the output to another directory:
 	./pipeline.rb -i input/ -p invert.p -o output/
 
