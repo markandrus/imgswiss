@@ -1,4 +1,6 @@
 # Pipeline.rb
+Mark Andrus Roberts <andrus@uchicago.edu>
+
 Pipeline.rb is an interface for manipulating single images, sequences of
 images, and frames dumped from video files, according to "plans" written in an
 intuitive, flexible domain-specific language (DSL).
@@ -36,17 +38,15 @@ another directory:
 
 Invert the inversion of an entire directory of images and
 save the output in-place:
-	./pipeline.rb -i input/ -p invert.p -p invert.p --in-place
-Or,
-	./pipeline.rb --in-dir input/ --plans invert.p,invert.p -I
++ `./pipeline.rb -i input/ -p invert.p -p invert.p --in-place`
++ `./pipeline.rb --in-dir input/ --plans invert.p,invert.p -I`
 
 Invert every frame of a video file and dump the results to a directory:
 	./pipeline.rb --in-vid family.mov --plan invert.p --out-dir frames/
 
 Just process a single via stdin:
-	cat gucci_mane.png | ./pipeline.rb --stdin -p invert.p >gucci_invert.png
-Or,
-	./pipeline.rb --stdin -p invert.p <gucci_mane.png >gucci_invert.png
++ `cat gucci_mane.png | ./pipeline.rb --stdin -p invert.p >gucci_invert.png`
++ `./pipeline.rb --stdin -p invert.p <gucci_mane.png >gucci_invert.png`
 
 ## Plan File Syntax
 The syntax for Pipeline.rb's plan-files is inspired in part by the patching
@@ -75,3 +75,4 @@ In the above example, `splitRGB` saves the red channel of our input to `$1`. We
 must store this before we call `edge` on the blue channel (`$2`), since the
 output of `edge` will be stored in `$1`. Finally we rejoin the channels. Note
 that the green channel (`$2`) is unmodified.
+
