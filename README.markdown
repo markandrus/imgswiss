@@ -2,7 +2,31 @@
 Pipeline.rb is an interface for manipulating single images, sequences of
 images, and frames dumped from video files, according to "plans" written in an
 intuitive, flexible domain-specific language (DSL).
-# Plan File Syntax
+
+## Installing
+To get Pipeline.rb running, first you must have Ruby: http://www.ruby-lang.org/en/downloads/
+
+Second, Pipeline.rb requires both RMagick (https://github.com/rmagick/rmagick)
+and FFMpeg (http://ffmpeg.org/download.html).
+
+RMagick depends on ImageMagick, which you may download or build for your
+system, depending on what suits you (http://www.imagemagick.org/script/index.php).
+If you already have ImageMagick installed, getting RMagick should be as simple
+as:
+	gem install rmagick
+
+Pipeline.rb interfaces with FFMpeg using Antonin Amand's ffmpeg-ruby gem.
+I don't think you can `gem install` this, and it is confusing because there are
+multiple similarly named packages on rubygems.org.
+
+Nevertheless, if you already have FFMpeg installed, you should be able to
+follow Amand's instructions to install ffmpeg-ruby: https://github.com/gwik/ffmpeg-ruby
+
+TIP: If you're like me, and couldn't figure out how to build FFMpeg to work
+with ffmpeg-ruby on OS X, try:
+	./configure --enable-shared --disable-static
+
+## Plan File Syntax
 The syntax for Pipeline.rb's plan-files is inspired in part by the patching
 systems implemented in both Max/MSP and PureData. Moreover, the language is
 intended to be equally intuitive.
