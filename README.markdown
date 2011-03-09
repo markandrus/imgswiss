@@ -5,7 +5,12 @@ intuitive, flexible domain-specific language (DSL).
 
 # Plan File Syntax
 The syntax for Pipeline.rb's plan-files is inspired in part by the patching
-systems implemented in both Max/MSP and PureData.
+systems implemented in both Max/MSP and PureData. Moreover, the language is
+intended to be equally intuitive.
+
+Plans allow for two types of commands:
++ Variable Assignments, and
++ Function Calls
 
 For example, a plan to swap the green and blue channels of an image, while
 inverting the red channel, takes the following form:
