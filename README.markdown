@@ -45,7 +45,6 @@ Invert an entire directory of images and save the output to another directory:
 Both of the following invert the inversion of an entire directory of images and save the output in-place:
 
 * `./pipeline.rb -i input/ -p invert.p -p invert.p --in-place`
-
 * `./pipeline.rb --in-dir input/ --plans invert.p,invert.p -I`
 
 Invert every frame of a video file and dump the results to a directory:
@@ -54,7 +53,6 @@ Invert every frame of a video file and dump the results to a directory:
 Both of the following process a single image via stdin:
 
 * `cat gucci_mane.png | ./pipeline.rb --stdin -p invert.p >gucci_invert.png`
-
 * `./pipeline.rb --stdin -p invert.p <gucci_mane.png >gucci_invert.png`
 
 ## Plan File Syntax
@@ -63,7 +61,6 @@ The syntax for Pipeline.rb's plan-files is inspired in part by the patching syst
 Plans allow for two types of commands:
 
 * Variable Assignments, and
-
 * Function Calls
 
 For example, a plan to swap the green and blue channels of an image, while inverting the red channel, takes the following form:
