@@ -73,5 +73,6 @@ In the above example, `splitRGB` saves the red channel of our input to `$1`. We
 must store this before we call `edge` on the blue channel (`$2`), since the
 output of `edge` will be stored in `$1`. Finally we rejoin the channels. Note
 that the green channel (`$2`) is unmodified.
-- - -
+
+***
 Written by *Mark Andrus Roberts*: <andrus@uchicago.edu>
