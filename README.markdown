@@ -25,7 +25,7 @@ Tip: If you're like me, and couldn't figure out how to build FFMpeg to work with
 Invert an entire directory of images and save the output to another directory:
 	./pipeline.rb -i input/ -p invert.p -o output/
 
-Invert the inversion of an entire directory of images and save the output in-place:
+Both of the following invert the inversion of an entire directory of images and save the output in-place:
 
 * `./pipeline.rb -i input/ -p invert.p -p invert.p --in-place`
 
@@ -34,7 +34,7 @@ Invert the inversion of an entire directory of images and save the output in-pla
 Invert every frame of a video file and dump the results to a directory:
 	./pipeline.rb --in-vid family.mov --plan invert.p --out-dir frames/
 
-Just process a single via stdin:
+Both of the following process a single image via stdin:
 
 * `cat gucci_mane.png | ./pipeline.rb --stdin -p invert.p >gucci_invert.png`
 
