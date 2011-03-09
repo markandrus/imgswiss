@@ -15,8 +15,8 @@ class OptionParse
         options.stdin = false
         options.inplace = false
         options.plans = []
-		options.invideo = ""
-		options.outvideo = ""
+        options.invideo = ""
+        options.outvideo = ""
 
         opts = OptionParser.new do |opts|
             opts.banner = "Pipeline-Based Image Editor <andrus@uchicago.edu>\n" +
@@ -31,14 +31,14 @@ class OptionParse
             opts.on("--stdin", "Read input for a single image via STDIN") do
                 options.stdin = true
             end
-            opts.on("-f", "--in-video PATH", "Read video using FFmpeg") do |path|
+            opts.on("--in-video PATH", String, "Read video using FFmpeg") do |path|
                 options.invideo = path
             end
             # Output
             opts.on("-o", "--out-dir DIR", "Save output to DIR") do |dir|
                 options.outdir = dir
             end
-            opts.on("-g", "--out-video PATH", "Save processed video as `filename'") do |path|
+            opts.on("--out-video PATH", String, "Save processed video as `filename'") do |path|
                 options.outvideo = path
             end
             opts.on("-I", "--in-place", "Overwrite input files with output") do
@@ -218,7 +218,7 @@ if options.stdin # are we processing stdin?
     if $verbose
         $stderr.puts "Reading single image from STDIN..."
     end
-    file = Magick::Image.new.from_blob(ARGF.read)
+    file = Magick::Image.from_blob(ARGF.read)
     if !file.nil?
         if $verbose
             $stderr.puts "    OK!"
@@ -239,8 +239,7 @@ elsif !options.indir.nil? # then let's load a dir of files
             if $verbose
                 $stderr.puts "    Adding `" + options.indir.path + file + "'"
             end
-            image = Magick::ImageList.new(options.indir.path + file)
-            files << image
+            files << Magick::ImageList.new(options.indir.path + file)
         end
     end
     # Apply 
@@ -276,16 +275,19 @@ elsif !options.invideo.empty? # then let's read a video
         #if !options.videostop.nil?
         #    puts "    Stop: " + options.videostop + " "
         #end
+        if !options.outdir.nil?
+            puts "Dumping frames to: `" + options.outdir + "'"
+        end
     end
     # THANKS: ffmpeg-ruby / animated_gif_example.rb
     video = FFMPEG::InputFormat.new(options.invideo)
-    stream = video.first_video_stream
+    framename = options.invideo.rpartition('/').last
     # TODO: Add a CLI option to specify initial offset
     # stream.seek(12)
     i = 0
     # pts is presentation timestamp
     # dts is decoding timestamp
-    stream.decode_frame do |frame, pts, dts|
+    video.first_video_stream.decode_frame do |frame, pts, dts|
         i += 1
         # TODO: Add a CLI option to specify the end
         # stop when decoding timestamp (~position) reach 18
@@ -293,25 +295,11 @@ elsif !options.invideo.empty? # then let's read a video
         # TODO: Change the 5 in the following. I don't know what this is? FPS?
         # decode 1 frame for 5
         next unless i % 5 == 0
-        image = Magick::ImageList.from_blob(frame.to_ppm)
-        frames << image
-    end
-    if $verbose
-        puts "Processing..."
-        # TODO: Rewrite the following
-        puts "    " + options.invideo + " >>= " + options.invideo
-    end
-    i = 0
-    if $verbose and !options.outdir.nil?
-        puts "Dumping frames to: `" + options.outdir + "'"
-    end
-    framename = options.invideo.rpartition('/').last
-    frames.each do |frame|
-        processed = $pipeline.to_proc.call({"1" => frame})['1'] # Process
-        if !options.outdir.nil? # write to outdir
-            # TODO: Add a CLI option to specify output frame filetype
-            processed.write(options.outdir + framename + i.to_s + '.png')
-            i += 1
+        # TODO: Add a CLI option to specify output frame filetype
+        if !options.outdir.nil?
+            $pipeline.to_proc.call(
+                    {"1" => Magick::ImageList.new.from_blob(frame.to_ppm)}
+                )['1'].write(options.outdir + framename + i.to_s + '.png')
         end
     end
 end
