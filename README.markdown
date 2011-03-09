@@ -2,7 +2,6 @@
 Pipeline.rb is an interface for manipulating single images, sequences of
 images, and frames dumped from video files, according to "plans" written in an
 intuitive, flexible domain-specific language (DSL).
-
 # Plan File Syntax
 The syntax for Pipeline.rb's plan-files is inspired in part by the patching
 systems implemented in both Max/MSP and PureData. Moreover, the language is
