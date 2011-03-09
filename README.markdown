@@ -7,8 +7,7 @@ To get Pipeline.rb running, first you must have [Ruby](http://www.ruby-lang.org/
 Second, Pipeline.rb requires both [RMagick](https://github.com/rmagick/rmagick) and [FFMpeg](http://ffmpeg.org/download.html).
 
 ### RMagick
-RMagick depends on [ImageMagick](http://www.imagemagick.org/), which you can download or build. Whatever floats your
-boat: (http://www.imagemagick.org/script/index.php)
+RMagick depends on [ImageMagick](http://www.imagemagick.org/), which you can download or build from [imagemagick.org](http://www.imagemagick.org).
 
 If you already have ImageMagick installed, getting RMagick should be as simple as:
 	gem install rmagick
@@ -16,7 +15,7 @@ If you already have ImageMagick installed, getting RMagick should be as simple a
 ### FFMpeg
 Pipeline.rb interfaces with [FFMpeg](http://ffmpeg.org/) using Antonin Amand's [ffmpeg-ruby](https://github.com/gwik/ffmpeg-ruby) gem. I don't think you can `gem install` this, and it is confusing because there are multiple similarly named packages on [RubyGems](rubygems.org).
 
-Nevertheless, if you already have FFMpeg installed, you should be able to follow Amand's instructions to install ffmpeg-ruby at (https://github.com/gwik/ffmpeg-ruby)
+Nevertheless, if you already have FFMpeg installed, you should be able to follow Amand's instructions to install ffmpeg-ruby at [https://github.com/gwik/ffmpeg-ruby](https://github.com/gwik/ffmpeg-ruby).
 
 Tip: If you're like me, and couldn't figure out how to build FFMpeg to work with ffmpeg-ruby on OS X, try:
 	./configure --enable-shared --disable-static
