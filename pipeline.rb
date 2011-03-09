@@ -16,29 +16,30 @@ class OptionParse
         options.inplace = false
         options.plans = []
 		options.invideo = ""
+		options.outvideo = ""
 
         opts = OptionParser.new do |opts|
             opts.banner = "Pipeline-Based Image Editor <andrus@uchicago.edu>\n" +
-                          "Usage: pln.rb [options]\n" +
-                          "Example: pln.rb -p plan.p -i images/"
+                          "Usage: pipeline.rb [options]\n" +
+                          "Example: pipeline.rb -p plan.p -i images/"
             opts.separator ""
             opts.separator "Specific options:"
             # Input
             opts.on("-i", "--in-dir DIR", "Read input from DIR") do |dir|
                 options.indir = Dir.new(dir)
             end
-            opts.on("--stdin", String, "Read input for a single image via STDIN") do
+            opts.on("--stdin", "Read input for a single image via STDIN") do
                 options.stdin = true
             end
-            opts.on("--in-video", String, "Read video using FFmpeg") do |input|
-                options.invideo = input
+            opts.on("-f", "--in-video PATH", "Read video using FFmpeg") do |path|
+                options.invideo = path
             end
             # Output
             opts.on("-o", "--out-dir DIR", "Save output to DIR") do |dir|
                 options.outdir = dir
             end
-            opts.on("--out-video", String, "Save processed video as `filename'") do |output|
-                options.outvideo = output
+            opts.on("-g", "--out-video PATH", "Save processed video as `filename'") do |path|
+                options.outvideo = path
             end
             opts.on("-I", "--in-place", "Overwrite input files with output") do
                 options.inplace = true
@@ -230,9 +231,6 @@ if options.stdin # are we processing stdin?
     end
 elsif !options.indir.nil? # then let's load a dir of files
     files = []
-    if !options.outvideo.nil?
-        video = FFMPEG::InputFormat.new(options.outvideo)
-    end
     if $verbose
         puts "Reading directory: `" + options.indir.path + "'"
     end
@@ -268,7 +266,7 @@ elsif !options.indir.nil? # then let's load a dir of files
             processed.write(file.filename)
         end
     end
-elsif !options.invideo.nil? # then let's read a video
+elsif !options.invideo.empty? # then let's read a video
     frames = []
     if $verbose
         puts "Reading video: `" + options.invideo + "'"
