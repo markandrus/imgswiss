@@ -19,7 +19,7 @@ class OptionParse
         options.outvideo = ""
 
         opts = OptionParser.new do |opts|
-            opts.banner = "Pipeline-Based Image Editor <andrus@uchicago.edu>\n" +
+            opts.banner = "Swiss Image Sequence Editor <andrus@uchicago.edu>\n" +
                           "Usage: pipeline.rb [options]\n" +
                           "Example: pipeline.rb -p plan.p -i images/"
             opts.separator ""
