@@ -10,7 +10,6 @@ load 'transforms.rb'
 load 'classes.rb'
 load 'utils.rb'
 
-
 # Parse options
 options = OptionParse.parse(ARGV)
 
@@ -39,18 +38,17 @@ elsif !options.indir.nil?
         $stderr.puts "Processing..."
     end
     options.indir.each do |file|
-        # TODO: Replace this with an actual file-check
-        if file != '.' && file != '..' 
+        if File.file?(options.indir.path + file)
             processed = $pipeline.to_proc.call({"1" => Magick::ImageList.new(options.indir.path + file)})['1']
 			# TODO: rewrite this so that processed.write() operates over a list
 			# of locations...
             if !options.outdir.nil?
-                processed.write(options.outdir + file)
                 if $verbose then $stderr.puts pipe_str(file, options.plans, options.outdir + file) end
+                processed.write(options.outdir + file)
 			end
             if options.inplace
-                processed.write(options.indir.path + file)
                 if $verbose then $stderr.puts pipe_str(file, options.plans, file) end
+                processed.write(options.indir.path + file)
             end
         end
     end
@@ -83,10 +81,10 @@ elsif !options.invideo.empty?
     video.first_video_stream.decode_frame do |frame, pts, dts|
         i += 1
         # TODO: Add a CLI option to specify the end
-            # stop when decoding timestamp (~position) reach 18
-            # break if dts > 18
-            # TODO: Change the 5 in the following. I don't know what this is? FPS?
-            # decode 1 frame for 5
+		# stop when decoding timestamp (~position) reach 18
+		# break if dts > 18
+		# TODO: Change the 5 in the following. I don't know what this is? FPS?
+		# decode 1 frame for 5
         next unless i % 5 == 0
         # TODO: Add a CLI option to specify output frame filetype
         if !options.outdir.nil?
