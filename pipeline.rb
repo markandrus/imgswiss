@@ -5,7 +5,6 @@ require 'RMagick'
 require 'ffmpeg'
 
 load 'options.rb'
-load 'utils.rb'
 load 'parser.rb'
 load 'transforms.rb'
 load 'classes.rb'
@@ -16,9 +15,9 @@ options = OptionParse.parse(ARGV)
 # Parse any given plan files, accumulating in `$pipeline`
 $pipeline = Transforms.new
 options.plans.each do |plan|
-    verbs "Parsing plan: `" + plan + "'"
+    if $verbose then $stderr.puts "Parsing plan: `" + plan + "'"
     File.readlines(plan).each do |line|
-        verbs '    "' + line.chomp! + '"'
+        if $verbose then $stderr.puts '    "' + line.chomp! + '"'
         $pipeline.add(&parse(line))
     end
 end
@@ -50,7 +49,7 @@ elsif !options.indir.nil?
             if !options.outdir.nil?
                 processed.write(options.outdir + file)
                 if $verbose then print_pipe(file, options.plans, options.outdir + file)
-            else
+            elsif options.inplace
                 processed.write(options.indir.path + file)
                 if $verbose then print_pipe(file, options.plans, file)
             end
