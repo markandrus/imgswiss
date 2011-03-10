@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 # parser.rb => Plan-File Parser
+require 'rubygems'
 require 'parslet'
 
 # Parslet::Parser
@@ -12,7 +13,7 @@ class Parser < Parslet::Parser
     # Function Calls, such as:
     #   alphaBlend $1 $alpha $img2
     rule(:fcall)        { fname >> args.as(:args) }
-    rule(:fname)        { alpha.repeat(1).as(:fname) >> space? }
+    rule(:fname)        { (alpha | match('_')).repeat(1).as(:fname) >> space? }
     rule(:args)         { (arg >> space).repeat >> arg }
     rule(:arg)          { var | arg_float.as(:float) | arg_int.as(:int) | arg_str.as(:string) }
     rule(:arg_str)      { alphanum.repeat(1) }
@@ -57,6 +58,6 @@ def parse(str)
         return build_transform('=', t[:assign][:args])
     end
 rescue Parslet::ParseFailed => error
-    puts error, t.root.error_tree
+    puts error #, t.root.error_tree
 end
 

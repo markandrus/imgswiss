@@ -18,8 +18,8 @@ $pipeline = Transforms.new
 options.plans.each do |plan|
     if $verbose then $stderr.puts "Parsing plan: `" + plan + "'" end
     File.readlines(plan).each do |line|
-        if $verbose then $stderr.puts '    "' + line.chomp! + '"' end
-        $pipeline.add(&parse(line))
+        if $verbose then $stderr.puts '    "' + line.chomp + '"' end
+        $pipeline.add(&parse(line.chomp))
     end
 end
 
@@ -57,8 +57,8 @@ elsif !options.indir.nil?
 elsif !options.invideo.empty?
     if $verbose
         $stderr.puts "Reading video: `" + options.invideo + "'"
-        if !options.vidstart.nil? then $stderr.puts "    Start: " + options.vidstart + " " end
-        if !options.vidend.nil? then $stderr.puts "    Stop: " + options.vidend + " " end
+        if !options.vidstart.nil? then $stderr.puts "    Start: " + options.vidstart.to_s + " " end
+        if !options.vidend.nil? then $stderr.puts "    Stop: " + options.vidend.to_s + " " end
         if !options.outdir.nil?
 			$stderr.puts pipe_str(options.invideo, options.plans, options.outdir)
 		else
@@ -66,14 +66,18 @@ elsif !options.invideo.empty?
         end
     end
     framename = options.invideo.rpartition('/').last
-    video = FFMPEG::InputFormat.new(options.invideo)
-    if !options.vidstart.nil? then stream.seek(options.vidstart) end
+    stream = FFMPEG::InputFormat.new(options.invideo).first_video_stream
+    if !options.vidstart.nil?
+		stream.seek(options.vidstart)
+	else
+		options.vidstart = 0
+	end
     i = 0
     # THANKS: ffmpeg-ruby/animated_gif_example.rb
-    video.first_video_stream.decode_frame do |frame, pts, dts|
+    stream.decode_frame do |frame, pts, dts|
         i += 1
 		if !options.vidend.nil?
-			break if dts > options.vidend
+			break if dts > (options.vidend*30 + options.vidstart*30)
 		end
 		if !options.framefilter.nil?
 			next unless i % options.framefilter == 0
@@ -82,7 +86,7 @@ elsif !options.invideo.empty?
 			type = options.frametype.nil? ? 'png' : options.frametype
             $pipeline.to_proc.call(
                     {"1" => Magick::ImageList.new.from_blob(frame.to_ppm)}
-                )['1'].write(options.outdir + framename + i.to_s + '.' + type)
+                )['1'].write(options.outdir + framename + '.' + i.to_s + '.' + type)
         end
     end
 end

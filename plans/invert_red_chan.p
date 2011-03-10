@@ -1,3 +1,3 @@
-splitRGB $1
+split_rgb $1
 invert $1
-joinRGB $1 $2 $3
+join_rgb $1 $2 $3

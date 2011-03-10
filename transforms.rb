@@ -5,15 +5,18 @@ require 'RMagick'
 # NOTE: This is a place holder function for now. It is intended to be called
 # when 
 def v(s, a)
-    return a.call(s)
+	if !a.nil?
+		return a.call(s)
+	end
 end
 
+# TODO: Is this crazy?
 $transforms = {
   # Standard
     # identity
     ''              => lambda { |s, a| s },
     # variable assignment
-    '='             => lambda { |s, a| { v(s,a[0]) => v(s,a[1]) } },
+    '='             => lambda { |s, a| { a[0] => v(s,a[1]) } },
   # RMagick
     # edge $$ radius 
     'edge'          => lambda { |s, a| { '1' => v(s,a[0]).edge(v(s,a[1])) } },
