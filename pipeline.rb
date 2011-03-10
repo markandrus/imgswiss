@@ -8,12 +8,8 @@ load 'options.rb'
 load 'parser.rb'
 load 'transforms.rb'
 load 'classes.rb'
+load 'utils.rb'
 
-def print_pipe(input, plans, output)
-    $stderr.print "    " + input
-    plans.each { |plan| $stderr.print " >>= " + plan }
-    $stderr.puts " >>= " + output
-end
 
 # Parse options
 options = OptionParse.parse(ARGV)
@@ -32,7 +28,7 @@ end
 if options.stdin
     if $verbose
         $stderr.puts "Processing..."
-        print_pipe("STDIN", options.plans, "STDOUT")
+        $stderr.puts pipe_str("STDIN", options.plans, "STDOUT")
     end
 	puts $pipeline.to_proc.call({"1" => Magick::Image.from_blob(ARGF.read)})['1'].to_blob
 
@@ -50,11 +46,11 @@ elsif !options.indir.nil?
 			# of locations...
             if !options.outdir.nil?
                 processed.write(options.outdir + file)
-                if $verbose then print_pipe(file, options.plans, options.outdir + file) end
+                if $verbose then $stderr.puts pipe_str(file, options.plans, options.outdir + file) end
 			end
             if options.inplace
                 processed.write(options.indir.path + file)
-                if $verbose then print_pipe(file, options.plans, file) end
+                if $verbose then $stderr.puts pipe_str(file, options.plans, file) end
             end
         end
     end
@@ -71,9 +67,9 @@ elsif !options.invideo.empty?
         #end
         if !options.outdir.nil?
             puts "Dumping frames to: `" + options.outdir + "'"
-			print_pipe(options.invideo, options.plans, options.outdir)
+			$stderr.puts pipe_str(options.invideo, options.plans, options.outdir)
 		else
-			print_pipe(options.invideo, options.plans, "/dev/null")
+			$stderr.puts pipe_str(options.invideo, options.plans, "/dev/null")
         end
     end
     # THANKS: ffmpeg-ruby / animated_gif_example.rb
