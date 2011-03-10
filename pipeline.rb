@@ -56,41 +56,33 @@ elsif !options.indir.nil?
 # --in-vid
 elsif !options.invideo.empty?
     if $verbose
-        puts "Reading video: `" + options.invideo + "'"
-        #if !options.videostart.nil?
-        #    puts "    Start: " + options.videostart + " "
-        #end
-        #if !options.videostop.nil?
-        #    puts "    Stop: " + options.videostop + " "
-        #end
+        $stderr.puts "Reading video: `" + options.invideo + "'"
+        if !options.vidstart.nil? then $stderr.puts "    Start: " + options.vidstart + " " end
+        if !options.vidend.nil? then $stderr.puts "    Stop: " + options.vidend + " " end
         if !options.outdir.nil?
-            puts "Dumping frames to: `" + options.outdir + "'"
 			$stderr.puts pipe_str(options.invideo, options.plans, options.outdir)
 		else
 			$stderr.puts pipe_str(options.invideo, options.plans, "/dev/null")
         end
     end
-    # THANKS: ffmpeg-ruby / animated_gif_example.rb
-    video = FFMPEG::InputFormat.new(options.invideo)
     framename = options.invideo.rpartition('/').last
-    # TODO: Add a CLI option to specify initial offset
-    # stream.seek(12)
+    video = FFMPEG::InputFormat.new(options.invideo)
+    if !options.vidstart.nil? then stream.seek(options.vidstart) end
     i = 0
-	# pts is presentation timestamp
-	# dts is decoding timestamp
+    # THANKS: ffmpeg-ruby/animated_gif_example.rb
     video.first_video_stream.decode_frame do |frame, pts, dts|
         i += 1
-        # TODO: Add a CLI option to specify the end
-		# stop when decoding timestamp (~position) reach 18
-		# break if dts > 18
-		# TODO: Change the 5 in the following. I don't know what this is? FPS?
-		# decode 1 frame for 5
-        next unless i % 5 == 0
-        # TODO: Add a CLI option to specify output frame filetype
+		if !options.vidend.nil?
+			break if dts > options.vidend
+		end
+		if !options.framefilter.nil?
+			next unless i % options.framefilter == 0
+		end
         if !options.outdir.nil?
+			type = options.frametype.nil? ? 'png' : options.frametype
             $pipeline.to_proc.call(
                     {"1" => Magick::ImageList.new.from_blob(frame.to_ppm)}
-                )['1'].write(options.outdir + framename + i.to_s + '.png')
+                )['1'].write(options.outdir + framename + i.to_s + '.' + type)
         end
     end
 end

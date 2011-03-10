@@ -14,6 +14,7 @@ class OptionParse
         options.invideo = ""
         options.outvideo = ""
 
+		# TODO: Is `to_i` necessary in some of these?
         opts = OptionParser.new do |opts|
             opts.banner = "Pipeline Image Sequence Editor <andrus@uchicago.edu>\n" +
                           "Usage: pipeline.rb [options]\n" +
@@ -27,13 +28,26 @@ class OptionParse
             opts.on("--stdin", "Read input for a single image via STDIN") do
                 options.stdin = true
             end
-            opts.on("--in-vid PATH", String, "Read video using FFmpeg") do |path|
+			# Input: Video
+            opts.on("--in-vid PATH", String, "Read video using FFMpeg") do |path|
                 options.invideo = path
             end
+			opts.on("--vid-start POS", Integer, "Process video from POS (default: 0)") do |pos|
+				options.vidstart = pos.to_i
+			end
+			opts.on("--vid-end POS", Integer, "Stop processing video at POS (default: `end`)") do |pos|
+				options.vidend = pos.to_i
+			end
+			opts.on("--frame-filter NUM", Integer, "Process every NUM frames (default: 1; i.e. every)") do |num|
+				options.framefilter = num.to_i
+			end
             # Output
             opts.on("-o", "--out-dir DIR", "Save output to DIR") do |dir|
                 options.outdir = dir
             end
+			opts.on("-t", "--frame-type TYPE", "Save frames as TYPE (default: png)") do |type|
+				options.frametype = type
+			end
             opts.on("--out-vid PATH", String, "Save processed video as `filename'") do |path|
                 options.outvideo = path
             end
