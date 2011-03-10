@@ -9,34 +9,34 @@ load 'parser.rb'
 load 'transforms.rb'
 load 'classes.rb'
 
-# Parse options
-options = OptionParse.parse(ARGV)
-
-# Parse any given plan files, accumulating in `$pipeline`
-$pipeline = Transforms.new
-options.plans.each do |plan|
-    if $verbose then $stderr.puts "Parsing plan: `" + plan + "'"
-    File.readlines(plan).each do |line|
-        if $verbose then $stderr.puts '    "' + line.chomp! + '"'
-        $pipeline.add(&parse(line))
-    end
-end
-
 def print_pipe(input, plans, output)
     $stderr.print "    " + input
     plans.each { |plan| $stderr.print " >>= " + plan }
     $stderr.puts " >>= " + output
 end
 
-# STDIN
+# Parse options
+options = OptionParse.parse(ARGV)
+
+# Parse any given plan files, accumulating in `$pipeline`
+$pipeline = Transforms.new
+options.plans.each do |plan|
+    if $verbose then $stderr.puts "Parsing plan: `" + plan + "'" end
+    File.readlines(plan).each do |line|
+        if $verbose then $stderr.puts '    "' + line.chomp! + '"' end
+        $pipeline.add(&parse(line))
+    end
+end
+
+# --std-in
 if options.stdin
     if $verbose
-        puts "Processing..."
+        $stderr.puts "Processing..."
         print_pipe("STDIN", options.plans, "STDOUT")
     end
 	puts $pipeline.to_proc.call({"1" => Magick::Image.from_blob(ARGF.read)})['1'].to_blob
 
-# DIRECTORY
+# --in-dir
 elsif !options.indir.nil?
     if $verbose
         $stderr.puts "Reading directory: `" + options.indir.path + "'"
@@ -46,17 +46,20 @@ elsif !options.indir.nil?
         # TODO: Replace this with an actual file-check
         if file != '.' && file != '..' 
             processed = $pipeline.to_proc.call({"1" => Magick::ImageList.new(options.indir.path + file)})['1']
+			# TODO: rewrite this so that processed.write() operates over a list
+			# of locations...
             if !options.outdir.nil?
                 processed.write(options.outdir + file)
-                if $verbose then print_pipe(file, options.plans, options.outdir + file)
-            elsif options.inplace
+                if $verbose then print_pipe(file, options.plans, options.outdir + file) end
+			end
+            if options.inplace
                 processed.write(options.indir.path + file)
-                if $verbose then print_pipe(file, options.plans, file)
+                if $verbose then print_pipe(file, options.plans, file) end
             end
         end
     end
 
-# VIDEO
+# --in-vid
 elsif !options.invideo.empty?
     if $verbose
         puts "Reading video: `" + options.invideo + "'"
@@ -68,6 +71,9 @@ elsif !options.invideo.empty?
         #end
         if !options.outdir.nil?
             puts "Dumping frames to: `" + options.outdir + "'"
+			print_pipe(options.invideo, options.plans, options.outdir)
+		else
+			print_pipe(options.invideo, options.plans, "/dev/null")
         end
     end
     # THANKS: ffmpeg-ruby / animated_gif_example.rb
@@ -76,8 +82,8 @@ elsif !options.invideo.empty?
     # TODO: Add a CLI option to specify initial offset
     # stream.seek(12)
     i = 0
-        # pts is presentation timestamp
-        # dts is decoding timestamp
+	# pts is presentation timestamp
+	# dts is decoding timestamp
     video.first_video_stream.decode_frame do |frame, pts, dts|
         i += 1
         # TODO: Add a CLI option to specify the end
