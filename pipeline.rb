@@ -4,11 +4,11 @@ require 'rubygems'
 require 'RMagick'
 require 'ffmpeg'
 
-load 'options.rb'
-load 'parser.rb'
-load 'transforms.rb'
-load 'classes.rb'
-load 'utils.rb'
+load 'src/options.rb'
+load 'src/parser.rb'
+load 'src/transforms.rb'
+load 'src/classes.rb'
+load 'src/utils.rb'
 
 # Parse options
 options = OptionParse.parse(ARGV)
