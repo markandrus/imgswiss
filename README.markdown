@@ -69,7 +69,7 @@ Both variable assignments and function calls take arguments of the following typ
 * Integer
 * Float
 * Predefined variables (i.e. `$1`, `$alpha`, etc.)
-* External files (i.e. `%(out/ice_cream.png)`)
+* External files (i.e. `%(masks/big_willie_style.png)`)
 * String (this is tentative...)
 
 For example, a plan to swap the green and blue channels of an image, while inverting the red channel, takes the following form:
