@@ -168,6 +168,11 @@ $transforms = {
     'multiply'      => lambda { |s, a| { '1' => v(s,a[0]).composite(
                                                     v(s,a[1]),
                                                     Magick::CenterGravity,
-                                                    Magick::MultiplyCompositeOp) } }
+                                                    Magick::MultiplyCompositeOp) } },
+	# screen $$ $src
+    'screen'      => lambda { |s, a| { '1' => v(s,a[0]).composite(
+                                                    v(s,a[1]),
+                                                    Magick::CenterGravity,
+                                                    Magick::ScreenCompositeOp) } }
 }
 

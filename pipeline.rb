@@ -77,7 +77,7 @@ elsif !options.invideo.empty?
     stream.decode_frame do |frame, pts, dts|
         i += 1
 		if !options.vidend.nil?
-			break if dts > (options.vidend*30 + options.vidstart*30)
+			break if dts > (options.vidend + options.vidstart)
 		end
 		if !options.framefilter.nil?
 			next unless i % options.framefilter == 0
