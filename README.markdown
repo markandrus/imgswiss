@@ -85,18 +85,12 @@ It is important to note that the numeric variables&mdash;`$1`, `$2`, etc.&mdash;
 
 In the above example, `splitRGB` saves the red channel of our input to `$1`. We must store this before we call `edge` on the blue channel (`$2`), since the output of `edge` will be stored in `$1`. Finally we rejoin the channels. Note that the green channel (`$2`) is unmodified.
 
-<del>The following example, `mask_red_chan.p`, exhibits all of the current features made availabe by the plan-file language. This plan applies a mask to the red channel of the input image:
-    $src = $1
-    $mask = %(masks/big_willie_style.png)
-    center_fit $mask $src
-    $mask = $1
-    split_rgb $src
-    $red   = $1
-    $green = $2
-    $blue  = $3
-    multiply $red $mask
-    join_rgb $1 $green $blue
-</del>
+### Improved Syntax
+The numbered variables in the above examples grow less intuitive as the complexity of an image transformation increases. Named variables circumvent this probably. Prior to this language feature, the following plan would have taken nearly 7 lines:
+	$r, $g, $b = split_rgb $1
+	$mask = center_fit %(images/masks/big_willie_style.png) $r
+	$r = multiply $mask $r
+	join_rgb $r $g $b
 
 ## TODO
 I am considering adopting a Ruby-esque syntax, wherein any function call with
