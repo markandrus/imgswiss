@@ -154,6 +154,12 @@ $transforms = {
                                                 (o.columns-i.columns)/2,
                                                 (o.rows-i.rows)/2
                                              )
-                                    { '1' => i.flatten_images } }
+                                    { '1' => i.flatten_images } },
+	# multiply $$ $src
+	# NOTE: Black
+	'multiply'      => lambda { |s, a| { '1' => v(s,a[0]).composite(
+													v(s,a[1]),
+													Magick::CenterGravity,
+													Magick::MultiplyCompositeOp) } }
 }
 
