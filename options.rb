@@ -14,7 +14,6 @@ class OptionParse
         options.invideo = ""
         options.outvideo = ""
 
-		# TODO: Is `to_i` necessary in some of these?
         opts = OptionParser.new do |opts|
             opts.banner = "Pipeline Image Sequence Editor <andrus@uchicago.edu>\n" +
                           "Usage: pipeline.rb [options]\n" +
