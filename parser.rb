@@ -4,6 +4,8 @@ require 'rubygems'
 require 'parslet'
 require 'RMagick' #for dealing with the 
 
+require 'pp'
+
 $files = { } # NOTE: This is our hash of any files sourced
              # from within a plan-file
 
@@ -49,7 +51,9 @@ def parse(str)
     def build_transform(name, args)
         def proc_arg(a)
             z = a.to_a.flatten
-            puts z
+            pp a
+            pp z
+            puts "---"
             case z[0]
                 when :var
                     return lambda { |state| state[z[1]] }
@@ -75,7 +79,8 @@ def parse(str)
     if t[:fcall] != nil
         return build_transform(t[:fcall][:fname], t[:fcall][:args])
     else
-        return build_transform('=', t[:assign][:args])
+        return build_transform('=', [{:string => t[:assign][:left][:var]},
+                                    t[:assign][:right]])
     end
 rescue Parslet::ParseFailed => error
     puts error #, t.root.error_tree # FIXME: What?
