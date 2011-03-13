@@ -97,3 +97,10 @@ The following example, `mask_red_chan.p`, exhibits all of the current features m
     multiply $red $mask
     join_rgb $1 $green $blue
 
+## TODO
+I would like to rewrite the parser to allow the above to be written as:
+	$mask = %(masks/big_willie_style.png) $1
+	$red, $green, $blue = split_rgb $1
+	multiply! $red $mask
+	join_rgb $red $green $blue
+
