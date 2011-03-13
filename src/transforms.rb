@@ -145,9 +145,9 @@ $transforms = {
                                                     Magick::GreenChannel) } },
     # join_rgb $$ $$ $$
     'join_rgb'      => lambda { |s, a| { '1' => Magick::Image.combine(
-                                                    v(s,a[0]),
-                                                    v(s,a[1]),
-                                                    v(s,a[2])) } },
+                                                    v(s,a[0]).cur_image,
+                                                    v(s,a[1]).cur_image,
+                                                    v(s,a[2]).cur_image) } },
     # center_fill $$ $parent
     'center_fill'   => lambda { |s, a| { '1' => v(s,a[0]).resize_to_fill(
                                                     v(s,a[1]).columns,

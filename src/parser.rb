@@ -91,7 +91,12 @@ def parse(str)
     elsif t[:fassign] != nil
         right = build_transform(t[:fassign][:fcall][:fname],
                                 t[:fassign][:fcall][:args])
-        left = t[:fassign][:left].map { |e| e[:var] }
+		left = []
+		if t[:fassign][:left].kind_of?(Array)
+			left = t[:fassign][:left].to_a.map { |e| e[:var] }
+		else
+			left = t[:fassign][:left][:var]
+		end
         return build_transform('<=', [{:varnames => left}, {:fcall => right}])
     end
 rescue Parslet::ParseFailed => error

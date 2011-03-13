@@ -85,7 +85,7 @@ It is important to note that the numeric variables&mdash;`$1`, `$2`, etc.&mdash;
 
 In the above example, `splitRGB` saves the red channel of our input to `$1`. We must store this before we call `edge` on the blue channel (`$2`), since the output of `edge` will be stored in `$1`. Finally we rejoin the channels. Note that the green channel (`$2`) is unmodified.
 
-The following example, `mask_red_chan.p`, exhibits all of the current features made availabe by the plan-file language. This plan applies a mask to the red channel of the input image:
+<del>The following example, `mask_red_chan.p`, exhibits all of the current features made availabe by the plan-file language. This plan applies a mask to the red channel of the input image:</del>
     $src = $1
     $mask = %(masks/big_willie_style.png)
     center_fit $mask $src
@@ -98,9 +98,9 @@ The following example, `mask_red_chan.p`, exhibits all of the current features m
     join_rgb $1 $green $blue
 
 ## TODO
-I would like to rewrite the parser to allow the above to be written as:
-	$mask = %(masks/big_willie_style.png) $1
-	$red, $green, $blue = split_rgb $1
-	multiply! $red $mask
-	join_rgb $red $green $blue
+I am considering adopting a Ruby-esque syntax, wherein any function call with
+an exclamation mark modifies its first argument in-place. I.e.,
+    multiply! $red $mask
+would be the same as
+    $red = multiply $red $mask
 
