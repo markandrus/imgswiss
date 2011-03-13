@@ -84,3 +84,16 @@ It is important to note that the numeric variables&mdash;`$1`, `$2`, etc.&mdash;
 	joinRGB $red $2 $1
 
 In the above example, `splitRGB` saves the red channel of our input to `$1`. We must store this before we call `edge` on the blue channel (`$2`), since the output of `edge` will be stored in `$1`. Finally we rejoin the channels. Note that the green channel (`$2`) is unmodified.
+
+The following example, `mask_red_chan.p`, exhibits all of the current features made availabe by the plan-file language. This plan applies a mask to the red channel of the input image.
+    $src = $1
+    $mask = %(masks/big_willie_style.png)
+    center_fit $mask $src
+    $mask = $1
+    split_rgb $src
+    $red   = $1
+    $green = $2
+    $blue  = $3
+    multiply $red $mask
+    join_rgb $1 $green $blue
+
