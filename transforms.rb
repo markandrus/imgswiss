@@ -3,10 +3,25 @@
 require 'RMagick'
 
 # NOTE: This is a place holder function for now. It is intended to be called
-# when 
+# when... 
 def v(s, a)
 	if !a.nil?
 		return a.call(s)
+	else
+		return nil
+	end
+end
+
+# NOTE: Need to use this version in a few places (`d` for 'default')
+def vd(s, a, d)
+	r = v(s, a)
+	# NOTE: If the potential return is not of the same type,
+	# we should return something appropriate (ie, the default)
+	# FIXME: Throw error on class inequality?
+	if r.nil || r.class != d.class
+		return d
+	else
+		return r
 	end
 end
 
@@ -16,6 +31,9 @@ $transforms = {
     # identity
     ''              => lambda { |s, a| s },
     # variable assignment
+    # NOTE: `v(s,a[0])` returns the name of the variable to be set,
+    #		and `v(s,a[1])` returns the actual value.
+    # TODO: Should Magick::Image[List](s) be getting `dup`ed?
     '='             => lambda { |s, a| { v(s,a[0]) => v(s,a[1]) } },
   # RMagick
     # edge $$ radius 
@@ -98,6 +116,11 @@ $transforms = {
 													v(s,a[2])) } },
     # radial_blur $$ float
     'radial_blur'   => lambda { |s, a| { '1' => v(s,a[0]).radial_blur(v(s,a[1])) } },
+	# resize_to_fill $$ width height gravity
+	'resize_to_fill'=> lambda { |s, a| { '1' => v(s,a[0]).resize_to_fill(
+													v(s,a[1]),
+													v(s,a[2]),
+													v(s,a[3])) } },
     # spread $$
     'spread'        => lambda { |s, a| { '1' => v(s,a[0]).spread } },
     # wave $$ int int
@@ -116,6 +139,11 @@ $transforms = {
     'join_rgb'      => lambda { |s, a| { '1' => Magick::Image.combine(
 													v(s,a[0]),
 													v(s,a[1]),
-													v(s,a[2])) } }
+													v(s,a[2])) } },
+	# center_to $$ $parent
+	'center_to'		=> lambda { |s, a| { '1' => v(s,a[0]).resize_to_fill(
+													v(s,a[1]).columns,
+													v(s,a[1]).rows,
+													Magick::CenterGravity) } }
 }
 

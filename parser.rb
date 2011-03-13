@@ -4,8 +4,6 @@ require 'rubygems'
 require 'parslet'
 require 'RMagick' #for dealing with the 
 
-require 'pp'
-
 $files = { } # NOTE: This is our hash of any files sourced
              # from within a plan-file
 
@@ -51,9 +49,6 @@ def parse(str)
     def build_transform(name, args)
         def proc_arg(a)
             z = a.to_a.flatten
-            pp a
-            pp z
-            puts "---"
             case z[0]
                 when :var
                     return lambda { |state| state[z[1]] }
@@ -63,7 +58,7 @@ def parse(str)
                     return lambda { |state| z[1].to_f }
                 when :file
                     # NOTE: We don't want to reopen any sourced images
-                    # each time we execute the plan, therefore we update
+                    # each time we execute a plan, therefore we keep
                     # a database of these images.
                     if $files[z[1]].nil?
                         $files[z[1]] = Magick::ImageList.new(z[1])
