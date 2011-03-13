@@ -75,7 +75,7 @@ For example, a plan to swap the green and blue channels of an image, while inver
 	invert $1
 	joinRGB $1 $3 $4
 
-It is important to note that the numeric variables -- `$1`, `$2`, etc. -- are routinely overwritten by function calls within a plan. For example, had we wanted to apply ImageMagick's edge filter with a strength of 8 to an image, we would have written:
+It is important to note that the numeric variables - `$1`, `$2`, etc. - are routinely overwritten by function calls within a plan. For example, had we wanted to apply ImageMagick's edge filter with a strength of 8 to an image, we would have written:
 	splitRGB
 	$red = $1
 	edge $3 8
