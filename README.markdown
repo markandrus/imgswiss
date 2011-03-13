@@ -13,9 +13,9 @@ If you already have ImageMagick installed, getting RMagick should be as simple a
 	gem install rmagick
 
 ### FFMpeg
-Pipeline.rb interfaces with [FFMpeg](http://ffmpeg.org/) using Antonin Amand's [ffmpeg-ruby](https://github.com/gwik/ffmpeg-ruby) gem. I don't think you can `gem install` this, and it is confusing because there are multiple similarly named packages on [RubyGems](rubygems.org).
+Pipeline.rb interfaces with [FFMpeg](http://ffmpeg.org/) using gwik's [ffmpeg-ruby](https://github.com/gwik/ffmpeg-ruby) gem. I don't think you can `gem install` this, and it is confusing because there are multiple similarly named packages on [RubyGems](rubygems.org).
 
-Nevertheless, if you already have FFMpeg installed, you should be able to follow Amand's instructions to install ffmpeg-ruby at [https://github.com/gwik/ffmpeg-ruby](https://github.com/gwik/ffmpeg-ruby).
+Nevertheless, if you already have FFMpeg installed, you should be able to follow gwik's instructions to install ffmpeg-ruby at [https://github.com/gwik/ffmpeg-ruby](https://github.com/gwik/ffmpeg-ruby).
 
 Tip: If you're like me, and couldn't figure out how to build FFMpeg to work with ffmpeg-ruby on OS X, try:
 	./configure --enable-shared --disable-static
