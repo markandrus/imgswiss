@@ -59,8 +59,16 @@ The syntax for Pipeline.rb's plan-files is inspired in part by the patching syst
 
 Plans allow for two types of commands:
 
-* Variable Assignments, and
-* Function Calls
+* Variable assignments, and
+* Function calls
+
+Both variable assignments and function calls take arguments of the following types:
+
+* Integer
+* Float
+* Predefined variables (i.e. `$1`, `$alpha`, etc.)
+* External files (i.e. `%(out/ice_cream.png)`)
+* String (this is tentative...)
 
 For example, a plan to swap the green and blue channels of an image, while inverting the red channel, takes the following form:
 	splitRGB $1
