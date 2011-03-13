@@ -86,13 +86,13 @@ It is important to note that the numeric variables&mdash;`$1`, `$2`, etc.&mdash;
 In the above example, `splitRGB` saves the red channel of our input to `$1`. We must store this before we call `edge` on the blue channel (`$2`), since the output of `edge` will be stored in `$1`. Finally we rejoin the channels. Note that the green channel (`$2`) is unmodified.
 
 ### Improved Syntax
-The numbered variables in the above examples grow less intuitive as the complexity of an image transformation increases. Named variables circumvent this probably. Prior to this language feature, the following plan would have taken nearly 7 lines:
+Relying on the numbered variable system in the above examples grows cumbersome as the complexity of a plan file increases. Named variables circumvent this problem. Prior to this language feature, the following plan would have taken nearly 7 lines:
 	$r, $g, $b = split_rgb $1
 	$mask = center_fit %(images/masks/big_willie_style.png) $r
 	$r = multiply $mask $r
 	join_rgb $r $g $b
 
-In the above example, only the final line modifies a numbered variable; `join_rgb` overwrites `$1`.
+Significantly, in the above example, only the final line modifies a numbered variable; `join_rgb` overwrites `$1`.
 
 ## TODO
 I am considering adopting a Ruby-esque syntax, wherein any function call with
