@@ -92,6 +92,8 @@ The numbered variables in the above examples grow less intuitive as the complexi
 	$r = multiply $mask $r
 	join_rgb $r $g $b
 
+In the above example, only the final line modifies a numbered variable; `join_rgb` overwrites `$1`.
+
 ## TODO
 I am considering adopting a Ruby-esque syntax, wherein any function call with
 an exclamation mark modifies its first argument in-place. I.e.,
