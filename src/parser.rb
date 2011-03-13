@@ -14,7 +14,7 @@ class Parser < Parslet::Parser
     root :expression
 
     # Expressions: either a Function Call or Variable Assignment
-    rule(:expression)   { fcall.as(:fcall) | assign.as(:assign) }
+    rule(:expression)   { fcall.as(:fcall) | fassign.as(:fassign) | assign.as(:assign) }
 
     # Function Calls, such as:
     #   alpha_blend $1 $alpha $img2
@@ -36,6 +36,12 @@ class Parser < Parslet::Parser
                           arg.as(:right) }
     rule(:var)          { str('$') >> arg_str.as(:var) }
 
+    # Function Assignment, such as:
+    #    `$r, $g, $b = split_rgb $1`, or
+    #    `$inv = invert $1`
+    rule(:fassign)      { ((var >> str(',') >> space?).repeat >> var >> space?).as(:left) >>
+                          set >> space? >> fcall.as(:fcall) }
+
     rule(:alphanum)     { alpha | num }
     rule(:num)          { match('[0-9]') }
     rule(:alpha)        { match('[a-zA-Z]') }
@@ -52,6 +58,12 @@ def parse(str)
             case z[0]
                 when :var
                     return lambda { |state| state[z[1]] }
+                when :varname
+                    return lambda { |state| z[1].to_s }
+                when :varnames # NOTE: drop first element, ie `:varnames`
+                    return lambda { |state| z.drop(1) }
+                when :fcall
+                    return z[1].to_proc
                 when :int
                     return lambda { |state| z[1].to_i }
                 when :float
@@ -73,9 +85,14 @@ def parse(str)
     t = Parser.new.parse(str)
     if t[:fcall] != nil
         return build_transform(t[:fcall][:fname], t[:fcall][:args])
-    else
-        return build_transform('=', [{:string => t[:assign][:left][:var]},
+    elsif t[:assign] != nil
+        return build_transform('=', [{:varname => t[:assign][:left][:var]},
                                     t[:assign][:right]])
+    elsif t[:fassign] != nil
+        right = build_transform(t[:fassign][:fcall][:fname],
+                                t[:fassign][:fcall][:args])
+        left = t[:fassign][:left].map { |e| e[:var] }
+        return build_transform('<=', [{:varnames => left}, {:fcall => right}])
     end
 rescue Parslet::ParseFailed => error
     puts error #, t.root.error_tree # FIXME: What?
